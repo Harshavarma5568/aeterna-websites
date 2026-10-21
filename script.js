@@ -513,7 +513,7 @@ contactForm?.addEventListener("submit", (event) => {
   if (BUSINESS_EMAIL === "info.aeternawebsites@gmail.com") {
     if (formFeedback) {
       formFeedback.textContent =
-        "Before launch, replace YOUR_EMAIL@example.com in script.js with your real business email.";
+        "";
     }
     return;
   }
