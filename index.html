@@ -266,29 +266,64 @@
           <p class="contact-note">Replace this sample address with your business email before launch.</p>
         </div>
 
-        <form class="contact-form reveal" id="contactForm">
-          <label for="name">Your name</label>
-          <input id="name" name="name" type="text" placeholder="How should we call you?" autocomplete="name" required />
+        
+<form class="contact-form reveal" id="contactForm">
+  <label for="name">Your name</label>
+  <input
+    id="name"
+    name="name"
+    type="text"
+    placeholder="How should we call you?"
+    autocomplete="name"
+    required
+  />
 
-          <label for="email">Email address</label>
-          <input id="email" name="email" type="email" placeholder="info.aeternawebsites@gmail.com" autocomplete="email" required />
+  <label for="email">Email address</label>
+  <input
+    id="email"
+    name="email"
+    type="email"
+    placeholder="Your email address"
+    autocomplete="email"
+    required
+  />
 
-          <label for="projectType">What do you have in mind?</label>
-          <select id="projectType" name="projectType" required>
-            <option value="" disabled selected>Choose a project type</option>
-            <option>Website design & development</option>
-            <option>3D / immersive experience</option>
-            <option>AI integration / automation</option>
-            <option>Brand & digital strategy</option>
-            <option>Something else</option>
-          </select>
+  <label for="projectType">What do you have in mind?</label>
+  <select id="projectType" name="project_type" required>
+    <option value="" disabled selected>Choose a project type</option>
+    <option>Website design &amp; development</option>
+    <option>3D / immersive experience</option>
+    <option>AI integration / automation</option>
+    <option>Brand &amp; digital strategy</option>
+    <option>Something else</option>
+  </select>
 
-          <label for="message">A little about your project</label>
-          <textarea id="message" name="message" rows="4" placeholder="The idea, the goal, the big picture..." required></textarea>
+  <label for="message">A little about your project</label>
+  <textarea
+    id="message"
+    name="message"
+    rows="4"
+    placeholder="The idea, the goal, the big picture..."
+    required
+  ></textarea>
 
-          <button class="button button-primary form-submit" type="submit">Send project enquiry <span class="button-arrow">↗</span></button>
-          <p class="form-feedback" id="formFeedback" aria-live="polite">This form opens your email app to send the enquiry.</p>
-        </form>
+  <input
+    type="hidden"
+    name="_subject"
+    value="New AETERNA Websites Project Enquiry"
+  />
+
+  <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
+  <button class="button button-primary form-submit" type="submit">
+    Send project enquiry <span class="button-arrow">↗</span>
+  </button>
+
+  <p class="form-feedback" id="formFeedback" aria-live="polite">
+    Tell us about your project. We’ll get back to you by email.
+  </p>
+</form>
+
       </div>
     </section>
   </main>
