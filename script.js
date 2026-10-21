@@ -491,7 +491,7 @@ initHeroScene();
    Replace with your real email before launch.
 ========================================== */
 
-const BUSINESS_EMAIL = "info.aeternawebsites.com";
+const BUSINESS_EMAIL = "info.aeternawebsites@gmail.com";
 
 const contactForm = $("#contactForm");
 const formFeedback = $("#formFeedback");
@@ -510,7 +510,7 @@ contactForm?.addEventListener("submit", (event) => {
 
   if (!contactForm.reportValidity()) return;
 
-  if (BUSINESS_EMAIL === "YOUR_EMAIL@example.com") {
+  if (BUSINESS_EMAIL === "info.aeternawebsites@gmail.com") {
     if (formFeedback) {
       formFeedback.textContent =
         "Before launch, replace YOUR_EMAIL@example.com in script.js with your real business email.";
