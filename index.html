@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08090d">
+  <meta name="description" content="Aeterna Websites creates premium websites, immersive 3D experiences and intelligent digital solutions for ambitious brands.">
+  <title>AETERNA — Digital, Beyond Ordinary</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <div class="loader" id="loader">
+    <div class="loader-logo">A<span>.</span></div>
+    <div class="loader-track"><span></span></div>
+    <p>CREATING SOMETHING EXTRAORDINARY</p>
+  </div>
+
+  <div class="noise"></div>
+
+  <header class="header">
+    <a class="brand" href="#home">
+      <span class="brand-icon">A<span>↗</span></span>
+      <span class="brand-name">AETERNA<small>WEBSITES</small></span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+
+    <nav class="navigation" id="navigation">
+      <a href="#work">Our work</a>
+      <a href="#services">Services</a>
+      <a href="#process">Our process</a>
+      <a href="#contact" class="nav-button">Let's talk <span>↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-grid"></div>
+
+      <div class="hero-content">
+        <div class="eyebrow reveal">
+          <span class="live-dot"></span>
+          INDEPENDENT DIGITAL STUDIO
+          <span class="eyebrow-line"></span> 2026
+        </div>
+
+        <h1 class="hero-title">
+          <span class="title-row reveal">WE BUILD</span>
+          <span class="title-row indent reveal">YOUR <em>next</em></span>
+          <span class="title-row reveal">BIG THING<span class="lime">.</span></span>
+        </h1>
+
+        <p class="hero-description reveal">
+          Ordinary websites get visited. Extraordinary experiences get remembered.
+          We build digital worlds that make ambitious brands impossible to ignore.
+        </p>
+
+        <div class="hero-actions reveal">
+          <a class="button button-primary" href="#contact">
+            <span>Start your project</span><span class="arrow">↗</span>
+          </a>
+          <a class="button-text" href="#work"><span class="circle-play">↓</span> Explore our universe</a>
+        </div>
+
+        <div class="hero-footer reveal">
+          <div class="availability"><span class="live-dot"></span> AVAILABLE FOR SELECT PROJECTS</div>
+          <div class="scroll-indicator"><span></span> SCROLL TO DISCOVER</div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <canvas id="scene3d" aria-label="Interactive three-dimensional abstract sculpture"></canvas>
+        <div class="visual-glow"></div>
+        <div class="visual-label label-top">01 / DIGITAL EXPERIENCE</div>
+        <div class="visual-label label-bottom"><span></span> BUILT BEYOND ORDINARY</div>
+        <div class="visual-coordinate">DESIGN<br>MEETS TECHNOLOGY</div>
+        <div class="visual-index">A—001</div>
+      </div>
+
+      <div class="hero-line"></div>
+    </section>
+
+    <div class="ticker">
+      <div class="ticker-track">
+        <span>STRATEGY</span><b>✳</b>
+        <span>DESIGN</span><b>✳</b>
+        <span>DEVELOPMENT</span><b>✳</b>
+        <span>IMMERSIVE 3D</span><b>✳</b>
+        <span>AI INTEGRATION</span><b>✳</b>
+        <span>STRATEGY</span><b>✳</b>
+        <span>DESIGN</span><b>✳</b>
+        <span>DEVELOPMENT</span><b>✳</b>
+        <span>IMMERSIVE 3D</span><b>✳</b>
+        <span>AI INTEGRATION</span><b>✳</b>
+      </div>
+    </div>
+
+    <section class="section intro" id="about">
+      <div class="eyebrow section-eyebrow reveal"><span>01</span> / THE AETERNA APPROACH</div>
+
+      <div class="intro-layout">
+        <h2 class="section-title reveal">
+          The world doesn't<br>
+          need another website.<br>
+          <span class="muted">It needs a reason to care.</span>
+        </h2>
+
+        <div class="intro-copy reveal">
+          <p>
+            Your website is often your first impression, your digital storefront,
+            and your strongest salesperson. We bring all three together through
+            thoughtful design, immersive technology, and clear strategy.
+          </p>
+          <a href="#services" class="underlined-link">Discover what we do <span>↗</span></a>
+        </div>
+      </div>
+
+      <div class="principles">
+        <article class="principle reveal">
+          <span class="number">01</span>
+          <div class="principle-icon">✳</div>
+          <h3>Design that stands apart</h3>
+          <p>Distinctive visual identities crafted to make your brand recognizable, credible, and memorable.</p>
+        </article>
+
+        <article class="principle reveal">
+          <span class="number">02</span>
+          <div class="principle-icon">⌁</div>
+          <h3>Experiences that move</h3>
+          <p>Purposeful animation, fluid transitions, and interactive 3D that bring your story to life.</p>
+        </article>
+
+        <article class="principle reveal">
+          <span class="number">03</span>
+          <div class="principle-icon">↗</div>
+          <h3>Built for real outcomes</h3>
+          <p>Clear messaging and intuitive journeys designed to help visitors become genuine enquiries.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section work-section" id="work">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow section-eyebrow reveal"><span>02</span> / SELECTED DIRECTIONS</div>
+          <h2 class="section-title reveal">Ideas become <em>experiences.</em></h2>
+        </div>
+        <p class="heading-note reveal">A glimpse of the digital worlds<br>we can create for ambitious brands.</p>
+      </div>
+
+      <div class="projects">
+        <a class="project project-large reveal" href="#contact">
+          <div class="project-image fitness">
+            <div class="fitness-sphere"></div>
+            <div class="fitness-ring"></div>
+            <div class="project-overline">CONCEPT 01 / FITNESS</div>
+            <div class="project-art-title">BUILT<br>DIFFERENT<span>.</span></div>
+            <span class="project-number">01</span>
+          </div>
+          <div class="project-caption">
+            <div>
+              <h3>MI-FIT — Performance culture</h3>
+              <p>Immersive storytelling · Fitness · 3D</p>
+            </div>
+            <span class="project-link">↗</span>
+          </div>
+        </a>
+
+        <a class="project reveal" href="#contact">
+          <div class="project-image aqua">
+            <div class="aqua-sphere"></div>
+            <div class="aqua-ring"></div>
+            <div class="project-overline">CONCEPT 02 / SEAFOOD</div>
+            <div class="project-art-title">FROM WATER<br>TO WORLD<span>.</span></div>
+            <span class="project-number">02</span>
+          </div>
+          <div class="project-caption">
+            <div>
+              <h3>Tokala Aqua Foods</h3>
+              <p>Product storytelling · Commerce</p>
+            </div>
+            <span class="project-link">↗</span>
+          </div>
+        </a>
+
+        <a class="project reveal" href="#contact">
+          <div class="project-image luxury">
+            <div class="luxury-frame">
+              <span>FORM / FUNCTION</span>
+              <strong>ATELIER<br>NO. 08</strong>
+              <small>OBJECTS FOR LIVING</small>
+            </div>
+            <span class="project-number">03</span>
+          </div>
+          <div class="project-caption">
+            <div>
+              <h3>Atelier No. 08</h3>
+              <p>Concept direction · Luxury interiors</p>
+            </div>
+            <span class="project-link">↗</span>
+          </div>
+        </a>
+      </div>
+
+      <p class="disclaimer reveal">
+        These are illustrative concept directions, not representations of completed client projects.
+      </p>
+    </section>
+
+    <section class="section services-section" id="services">
+      <div class="eyebrow section-eyebrow reveal"><span>03</span> / WHAT WE DO</div>
+
+      <div class="services-heading">
+        <h2 class="section-title reveal">Digital, <em>without limits.</em></h2>
+        <p class="reveal">
+          From the first idea to the final interaction, we create digital
+          experiences that look exceptional and work hard for your business.
+        </p>
+      </div>
+
+      <div class="service-list">
+        <article class="service-row reveal">
+          <span class="service-number">01</span>
+          <div class="service-main"><h3>Premium websites</h3><p>Business websites, landing pages, and digital storefronts.</p></div>
+          <div class="service-tags"><span>Responsive</span><span>SEO foundations</span><span>Conversion</span></div>
+          <span class="service-arrow">↗</span>
+        </article>
+
+        <article class="service-row reveal">
+          <span class="service-number">02</span>
+          <div class="service-main"><h3>3D & motion experiences</h3><p>Interactive worlds, cinematic animation, and scroll storytelling.</p></div>
+          <div class="service-tags"><span>Three.js</span><span>WebGL</span><span>Motion</span></div>
+          <span class="service-arrow">↗</span>
+        </article>
+
+        <article class="service-row reveal">
+          <span class="service-number">03</span>
+          <div class="service-main"><h3>Brand & UI/UX design</h3><p>Visual identities and intuitive digital journeys.</p></div>
+          <div class="service-tags"><span>Art direction</span><span>UI / UX</span><span>Identity</span></div>
+          <span class="service-arrow">↗</span>
+        </article>
+
+        <article class="service-row reveal">
+          <span class="service-number">04</span>
+          <div class="service-main"><h3>AI & smart integrations</h3><p>Practical AI features, chat assistants, and workflow automation.</p></div>
+          <div class="service-tags"><span>AI tools</span><span>APIs</span><span>Automation</span></div>
+          <span class="service-arrow">↗</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="manifesto">
+      <div class="manifesto-orbit orbit-one"></div>
+      <div class="manifesto-orbit orbit-two"></div>
+      <div class="manifesto-content reveal">
+        <span class="manifesto-mark">A.</span>
+        <p>Don't just exist online.<br><em>Mean something.</em></p>
+        <span class="manifesto-caption">AETERNA — DIGITAL, BEYOND ORDINARY</span>
+      </div>
+    </section>
+
+    <section class="section process-section" id="process">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow section-eyebrow reveal"><span>04</span> / HOW WE WORK</div>
+          <h2 class="section-title reveal">Clarity first.<br><em>Magic follows.</em></h2>
+        </div>
+        <p class="heading-note reveal">A transparent, collaborative journey<br>from your idea to launch day.</p>
+      </div>
+
+      <div class="process-grid">
+        <article class="process-card reveal">
+          <span>01 / DISCOVER</span><div class="process-icon">⌕</div>
+          <h3>Understand</h3><p>We learn about your business, audience, goals, and what makes you different.</p>
+        </article>
+        <article class="process-card reveal">
+          <span>02 / DEFINE</span><div class="process-icon">◫</div>
+          <h3>Shape the vision</h3><p>We plan the experience, creative direction, content, and scope.</p>
+        </article>
+        <article class="process-card reveal">
+          <span>03 / CREATE</span><div class="process-icon">✳</div>
+          <h3>Build the world</h3><p>Design, development, animation, and feedback come together.</p>
+        </article>
+        <article class="process-card reveal">
+          <span>04 / LAUNCH</span><div class="process-icon">↗</div>
+          <h3>Go beyond</h3><p>We test, refine, launch, and identify opportunities for improvement.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contact">
+      <div class="contact-glow"></div>
+      <div class="eyebrow section-eyebrow reveal"><span>05</span> / LET'S CREATE</div>
+
+      <div class="contact-layout">
+        <div class="contact-copy reveal">
+          <h2>Have a big<br><em>idea?</em></h2>
+          <p>
+            Tell us what you're imagining. Let's turn it into a digital experience
+            people remember and a powerful next step for your business.
+          </p>
+          <div class="availability"><span class="live-dot"></span> LET'S TALK ABOUT YOUR PROJECT</div>
+        </div>
+
+        <form class="contact-form reveal" id="contactForm">
+          <div class="form-top"><span>PROJECT ENQUIRY</span><span>A—001</span></div>
+
+          <label>
+            Your name
+            <input name="name" type="text" placeholder="What should we call you?" required autocomplete="name">
+          </label>
+
+          <label>
+            Your email
+            <input name="email" type="email" placeholder="you@company.com" required autocomplete="email">
+          </label>
+
+          <label>
+            What do you want to build?
+            <select name="service" required>
+              <option value="" disabled selected>Select a service</option>
+              <option>Premium business website</option>
+              <option>3D immersive website</option>
+              <option>E-commerce website</option>
+              <option>Brand and UI/UX design</option>
+              <option>AI integration</option>
+              <option>Something else</option>
+            </select>
+          </label>
+
+          <label>
+            Tell us about your idea
+            <textarea name="details" rows="3" placeholder="Goals, inspiration, timeline..."></textarea>
+          </label>
+
+          <button type="submit" class="button button-primary submit-button">
+            <span>Prepare my enquiry</span><span class="arrow">↗</span>
+          </button>
+
+          <p class="form-help">Your email app will open with a prepared message. Nothing is sent automatically.</p>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="brand" href="#home">
+      <span class="brand-icon">A<span>↗</span></span>
+      <span class="brand-name">AETERNA<small>WEBSITES</small></span>
+    </a>
+    <p>Digital, beyond ordinary.</p>
+    <div class="footer-links">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+      <a href="#home">Back to top ↑</a>
+    </div>
+    <span class="copyright">© <span id="year"></span> AETERNA WEBSITES</span>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
