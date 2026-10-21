@@ -491,49 +491,57 @@ initHeroScene();
    Replace with your real email before launch.
 ========================================== */
 
-const BUSINESS_EMAIL = "info.aeternawebsites@gmail.com";
 
-const contactForm = $("#contactForm");
-const formFeedback = $("#formFeedback");
-const emailLink = $("#emailLink");
+const contactForm = document.getElementById("contactForm");
+const formFeedback = document.getElementById("formFeedback");
 
-if (emailLink) {
-  emailLink.href = `mailto:${BUSINESS_EMAIL}`;
-  emailLink.textContent = BUSINESS_EMAIL;
-  const arrow = document.createElement("span");
-  arrow.textContent = " ↗";
-  emailLink.appendChild(arrow);
-}
+if (contactForm && formFeedback) {
+  contactForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-contactForm?.addEventListener("submit", (event) => {
-  event.preventDefault();
+    const submitButton = contactForm.querySelector(
+      'button[type="submit"]'
+    );
 
-  if (!contactForm.reportValidity()) return;
+    const originalButtonHTML = submitButton.innerHTML;
 
-  if (BUSINESS_EMAIL === "info.aeternawebsites@gmail.com") {
-    if (formFeedback) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending enquiry...";
+    formFeedback.textContent = "Sending your project details securely...";
+
+    try {
+      const response = await fetch(
+        "https://formsubmit.co/ajax/info.aeternawebsites@gmail.com",
+        {
+          method: "POST",
+          body: new FormData(contactForm),
+          headers: {
+            Accept: "application/json"
+          }
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || "Submission failed.");
+      }
+
       formFeedback.textContent =
-        "";
+        "Thank you! Your enquiry has been submitted successfully.";
+
+      contactForm.reset();
+    } catch (error) {
+      console.error("Contact form error:", error);
+
+      formFeedback.textContent =
+        "We couldn't send your enquiry. Please try again or email info.aeternawebsites@gmail.com.";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonHTML;
     }
-    return;
-  }
-
-  const data = new FormData(contactForm);
-
-  const name = String(data.get("name") || "").trim();
-  const email = String(data.get("email") || "").trim();
-  const projectType = String(data.get("projectType") || "").trim();
-  const message = String(data.get("message") || "").trim();
-
-  const subject = encodeURIComponent(`Project enquiry from ${name}`);
-  const body = encodeURIComponent(
-    `Name: ${name}\nEmail: ${email}\nProject type: ${projectType}\n\nProject details:\n${message}`
-  );
-
-  if (formFeedback) {
-    formFeedback.textContent =
-      "Opening your email app. Please send the prepared message to complete your enquiry.";
-  }
+  });
+}
 
   window.location.href =
     `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
