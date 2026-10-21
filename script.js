@@ -491,7 +491,7 @@ initHeroScene();
    Replace with your real email before launch.
 ========================================== */
 
-const BUSINESS_EMAIL = "YOUR_EMAIL@example.com";
+const BUSINESS_EMAIL = "info.aeternawebsites.com";
 
 const contactForm = $("#contactForm");
 const formFeedback = $("#formFeedback");
