@@ -546,3 +546,15 @@ if (contactForm && formFeedback) {
   window.location.href =
     `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
 });
+
+/* Preloader safety fallback */
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const preloader = document.getElementById("preloader");
+
+    if (preloader) {
+      preloader.classList.add("loaded");
+    }
+  }, 1500);
+});
+
