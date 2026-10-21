@@ -1,453 +1,540 @@
 
-import * as THREE from 'three';
+import * as THREE from "three";
 
-const reducedMotion = window.matchMedia(
-  '(prefers-reduced-motion: reduce)'
-).matches;
+document.documentElement.classList.add("js-ready");
 
-// =====================================
-// 1. CINEMATIC LOADING SCREEN
-// =====================================
+/* ==========================================
+   AETERNA — INTERACTIONS & 3D EXPERIENCE
+========================================== */
 
-const loader = document.getElementById('loader');
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) =>
+  Array.from(root.querySelectorAll(selector));
 
-document.body.classList.add('loading');
+/* LOADER */
 
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    loader?.classList.add('done');
-    document.body.classList.remove('loading');
+const preloader = $("#preloader");
 
-    document.querySelectorAll('.hero .reveal').forEach((element, index) => {
-      setTimeout(() => {
-        element.classList.add('visible');
-      }, reducedMotion ? 0 : 100 + index * 110);
-    });
-  }, reducedMotion ? 0 : 700);
-});
-
-// =====================================
-// 2. MOBILE NAVIGATION
-// =====================================
-
-const menuToggle = document.getElementById('menuToggle');
-const navigation = document.getElementById('navigation');
-
-function closeNavigation() {
-  navigation?.classList.remove('open');
-  menuToggle?.setAttribute('aria-expanded', 'false');
-  menuToggle?.setAttribute('aria-label', 'Toggle navigation');
+function dismissLoader() {
+  if (preloader) preloader.classList.add("loaded");
 }
 
-menuToggle?.addEventListener('click', () => {
-  const isOpen =
-    menuToggle.getAttribute('aria-expanded') !== 'true';
-
-  menuToggle.setAttribute('aria-expanded', String(isOpen));
-  navigation?.classList.toggle('open', isOpen);
+window.addEventListener("load", () => {
+  window.setTimeout(dismissLoader, 450);
 });
 
-navigation?.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', closeNavigation);
+window.setTimeout(dismissLoader, 2200);
+
+/* MOBILE NAVIGATION */
+
+const menuToggle = $("#menuToggle");
+const siteNav = $("#siteNav");
+const navLinks = $$(".nav-link", siteNav || document);
+
+function closeMenu() {
+  if (!menuToggle || !siteNav) return;
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Open navigation");
+  siteNav.classList.remove("open");
+  document.body.classList.remove("menu-open");
+}
+
+menuToggle?.addEventListener("click", () => {
+  const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+
+  menuToggle.setAttribute("aria-expanded", String(!isOpen));
+  menuToggle.setAttribute(
+    "aria-label",
+    isOpen ? "Open navigation" : "Close navigation"
+  );
+
+  siteNav?.classList.toggle("open", !isOpen);
+  document.body.classList.toggle("menu-open", !isOpen);
 });
 
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeNavigation();
+$$('a[href^="#"]').forEach((link) => {
+  link.addEventListener("click", () => {
+    closeMenu();
+  });
 });
 
-// =====================================
-// 3. SCROLL REVEAL ANIMATIONS
-// =====================================
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeMenu();
+});
 
-const revealElements = document.querySelectorAll(
-  '.reveal:not(.hero .reveal)'
+/* SCROLL REVEALS */
+
+const revealElements = $$(".reveal");
+
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -30px 0px" }
+  );
+
+  revealElements.forEach((element) => revealObserver.observe(element));
+} else {
+  revealElements.forEach((element) => element.classList.add("in-view"));
+}
+
+/* ACTIVE NAVIGATION */
+
+const sections = $$("main section[id]");
+const navObserver = new IntersectionObserver(
+  (entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (!visible) return;
+
+    navLinks.forEach((link) => {
+      const active = link.getAttribute("href") === `#${visible.target.id}`;
+      link.classList.toggle("active", active);
+    });
+  },
+  { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.2, 0.5] }
 );
 
-if ('IntersectionObserver' in window && !reducedMotion) {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.12,
-    rootMargin: '0px 0px -30px 0px'
-  });
+sections.forEach((section) => navObserver.observe(section));
 
-  revealElements.forEach(element => observer.observe(element));
-} else {
-  revealElements.forEach(element => {
-    element.classList.add('visible');
-  });
+/* BACK TO TOP */
+
+const backToTop = $("#backToTop");
+
+function updateScrollUI() {
+  backToTop?.classList.toggle("visible", window.scrollY > 600);
 }
 
-// =====================================
-// 4. INTERACTIVE THREE.JS HERO
-// =====================================
+window.addEventListener("scroll", updateScrollUI, { passive: true });
+updateScrollUI();
 
-const canvas = document.getElementById('scene3d');
+backToTop?.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
 
-if (canvas) {
+/* FOOTER YEAR */
+
+const year = $("#year");
+if (year) year.textContent = String(new Date().getFullYear());
+
+/* ==========================================
+   THREE.JS — CYAN / COBALT / AMBER SCULPTURE
+========================================== */
+
+function initHeroScene() {
+  const canvas = $("#heroCanvas");
+  if (!canvas) return;
+
+  const host = canvas.parentElement;
+  if (!host) return;
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
+
+  let renderer;
+
   try {
-    const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(
-      38, 1, 0.1, 100
-    );
-
-    camera.position.set(0, 0, 8.8);
-
-    const renderer = new THREE.WebGLRenderer({
+    renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: true,
-      powerPreference: 'high-performance'
+      antialias: !isMobile,
+      powerPreference: "high-performance"
     });
-
-    renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio || 1, 1.7)
-    );
-
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xc9c4ff, 1.2));
-
-    const limeLight = new THREE.PointLight(
-      0xd7ff7a, 32, 20
-    );
-    limeLight.position.set(3, 3, 5);
-    scene.add(limeLight);
-
-    const violetLight = new THREE.PointLight(
-      0x7862ff, 38, 20
-    );
-    violetLight.position.set(-3, -1, 2);
-    scene.add(violetLight);
-
-    const warmLight = new THREE.PointLight(
-      0xff704d, 15, 16
-    );
-    warmLight.position.set(1, -3, -2);
-    scene.add(warmLight);
-
-    // Main sculpture
-    const sculpture = new THREE.Group();
-    scene.add(sculpture);
-
-    const limeMetal = new THREE.MeshPhysicalMaterial({
-      color: 0xd7ff7a,
-      metalness: 0.78,
-      roughness: 0.2,
-      clearcoat: 1,
-      clearcoatRoughness: 0.15
-    });
-
-    const violetMetal = new THREE.MeshPhysicalMaterial({
-      color: 0xa99aff,
-      metalness: 0.72,
-      roughness: 0.22,
-      clearcoat: 1
-    });
-
-    const darkMetal = new THREE.MeshPhysicalMaterial({
-      color: 0x302c3b,
-      metalness: 0.9,
-      roughness: 0.24,
-      clearcoat: 0.8
-    });
-
-    // Large metallic ring
-    const ringOne = new THREE.Mesh(
-      new THREE.TorusGeometry(1.45, 0.21, 32, 160),
-      limeMetal
-    );
-
-    ringOne.rotation.set(0.62, 0.35, -0.48);
-    sculpture.add(ringOne);
-
-    // Interlocking violet ring
-    const ringTwo = new THREE.Mesh(
-      new THREE.TorusGeometry(1.08, 0.13, 28, 144),
-      violetMetal
-    );
-
-    ringTwo.rotation.set(-0.8, 0.2, 0.65);
-    sculpture.add(ringTwo);
-
-    // Inner dark metallic ring
-    const ringThree = new THREE.Mesh(
-      new THREE.TorusGeometry(0.68, 0.075, 24, 120),
-      darkMetal
-    );
-
-    ringThree.rotation.set(1.2, -0.4, -0.2);
-    sculpture.add(ringThree);
-
-    // Central crystal
-    const crystal = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.43, 2),
-      new THREE.MeshPhysicalMaterial({
-        color: 0xf0ebff,
-        metalness: 0.55,
-        roughness: 0.13,
-        transmission: 0.08,
-        thickness: 1.2,
-        clearcoat: 1
-      })
-    );
-
-    sculpture.add(crystal);
-
-    // Fine orbit rings
-    const orbitOne = new THREE.Mesh(
-      new THREE.TorusGeometry(2.05, 0.006, 8, 180),
-      new THREE.MeshBasicMaterial({
-        color: 0x9680ff,
-        transparent: true,
-        opacity: 0.48
-      })
-    );
-
-    orbitOne.rotation.set(1.15, 0.25, 0.2);
-    sculpture.add(orbitOne);
-
-    const orbitTwo = new THREE.Mesh(
-      new THREE.TorusGeometry(2.3, 0.004, 8, 180),
-      new THREE.MeshBasicMaterial({
-        color: 0xd7ff7a,
-        transparent: true,
-        opacity: 0.32
-      })
-    );
-
-    orbitTwo.rotation.set(0.25, 1.05, -0.3);
-    sculpture.add(orbitTwo);
-
-    // Floating particles
-    const particlePositions = [];
-
-    for (let i = 0; i < 220; i++) {
-      const radius = 2.2 + Math.random() * 1.8;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-
-      particlePositions.push(
-        radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.sin(phi) * Math.sin(theta),
-        radius * Math.cos(phi)
-      );
-    }
-
-    const particleGeometry = new THREE.BufferGeometry();
-
-    particleGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(particlePositions, 3)
-    );
-
-    const particles = new THREE.Points(
-      particleGeometry,
-      new THREE.PointsMaterial({
-        color: 0xcac3ff,
-        size: 0.018,
-        transparent: true,
-        opacity: 0.7
-      })
-    );
-
-    scene.add(particles);
-
-    // Pointer interaction
-    const visual = canvas.parentElement;
-
-    let pointerX = 0;
-    let pointerY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    visual.addEventListener('pointermove', event => {
-      const bounds = visual.getBoundingClientRect();
-
-      targetX =
-        ((event.clientX - bounds.left) / bounds.width - 0.5) * 0.55;
-
-      targetY =
-        ((event.clientY - bounds.top) / bounds.height - 0.5) * 0.4;
-    }, { passive: true });
-
-    visual.addEventListener('pointerleave', () => {
-      targetX = 0;
-      targetY = 0;
-    }, { passive: true });
-
-    // Responsive renderer
-    function resizeScene() {
-      const width = Math.max(1, visual.clientWidth);
-      const height = Math.max(1, visual.clientHeight);
-
-      renderer.setSize(width, height, false);
-
-      camera.aspect = width / height;
-      camera.position.z = width < 500 ? 9.5 : 8.8;
-
-      camera.updateProjectionMatrix();
-    }
-
-    const resizeObserver = new ResizeObserver(resizeScene);
-    resizeObserver.observe(visual);
-    resizeScene();
-
-    // Animation loop
-    const clock = new THREE.Clock();
-    let animationFrame = null;
-    let isVisible = true;
-
-    function animate() {
-      if (!isVisible || document.hidden) return;
-
-      animationFrame = requestAnimationFrame(animate);
-
-      const time = clock.getElapsedTime();
-
-      pointerX += (targetX - pointerX) * 0.035;
-      pointerY += (targetY - pointerY) * 0.035;
-
-      if (!reducedMotion) {
-        sculpture.rotation.y = time * 0.12 + pointerX;
-        sculpture.rotation.x =
-          Math.sin(time * 0.22) * 0.1 + pointerY;
-
-        ringOne.rotation.z =
-          -0.48 + Math.sin(time * 0.28) * 0.08;
-
-        ringTwo.rotation.y = 0.2 + time * 0.08;
-        orbitOne.rotation.z = 0.2 + time * 0.035;
-        particles.rotation.y = time * 0.018;
-
-        crystal.scale.setScalar(
-          1 + Math.sin(time * 1.1) * 0.035
-        );
-      }
-
-      renderer.render(scene, camera);
-    }
-
-    function startAnimation() {
-      if (isVisible && !document.hidden && animationFrame === null) {
-        animate();
-      }
-    }
-
-    function stopAnimation() {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = null;
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopAnimation();
-      } else {
-        startAnimation();
-      }
-    });
-
-    startAnimation();
-
   } catch (error) {
-    console.error('3D scene unavailable:', error);
-    // The rest of the website remains usable if WebGL fails.
+    console.warn("WebGL is unavailable; the CSS hero remains visible.", error);
+    return;
   }
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.25;
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+  camera.position.set(0, 0, 8.6);
+
+  const sculpture = new THREE.Group();
+  scene.add(sculpture);
+
+  const cyanMaterial = new THREE.MeshStandardMaterial({
+    color: 0x00e5c9,
+    metalness: 0.7,
+    roughness: 0.23,
+    emissive: 0x003a34,
+    emissiveIntensity: 1.1
+  });
+
+  const blueMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0066ff,
+    metalness: 0.78,
+    roughness: 0.22,
+    emissive: 0x001a70,
+    emissiveIntensity: 1.25
+  });
+
+  const orangeMaterial = new THREE.MeshStandardMaterial({
+    color: 0xff9000,
+    metalness: 0.65,
+    roughness: 0.25,
+    emissive: 0x4a1800,
+    emissiveIntensity: 1.1
+  });
+
+  const silverMaterial = new THREE.MeshStandardMaterial({
+    color: 0xd8e2ed,
+    metalness: 0.85,
+    roughness: 0.2,
+    emissive: 0x182b40,
+    emissiveIntensity: 0.45
+  });
+
+  const darkMaterial = new THREE.MeshStandardMaterial({
+    color: 0x101d2b,
+    metalness: 0.8,
+    roughness: 0.27,
+    wireframe: false
+  });
+
+  scene.add(new THREE.HemisphereLight(0x9acfff, 0x06101b, 2.2));
+
+  const cyanLight = new THREE.PointLight(0x00e5c9, 42, 15);
+  cyanLight.position.set(-3, 2, 3);
+  scene.add(cyanLight);
+
+  const blueLight = new THREE.PointLight(0x0066ff, 55, 16);
+  blueLight.position.set(3, 1, 2);
+  scene.add(blueLight);
+
+  const orangeLight = new THREE.PointLight(0xff9000, 38, 14);
+  orangeLight.position.set(0, -2, 3);
+  scene.add(orangeLight);
+
+  const topLight = new THREE.DirectionalLight(0xffffff, 3.5);
+  topLight.position.set(2, 5, 6);
+  scene.add(topLight);
+
+  const rimLight = new THREE.DirectionalLight(0x0066ff, 2.5);
+  rimLight.position.set(-4, 0, -3);
+  scene.add(rimLight);
+
+  /* A layered metallic diamond / abstract A form */
+
+  const shapePoints = [
+    new THREE.Vector2(0, 1.55),
+    new THREE.Vector2(0.23, 0.7),
+    new THREE.Vector2(1.15, -0.8),
+    new THREE.Vector2(0.42, -0.65),
+    new THREE.Vector2(0, -1.4),
+    new THREE.Vector2(-0.42, -0.65),
+    new THREE.Vector2(-1.15, -0.8),
+    new THREE.Vector2(-0.23, 0.7)
+  ];
+
+  const emblemShape = new THREE.Shape();
+  emblemShape.moveTo(shapePoints[0].x, shapePoints[0].y);
+  shapePoints.slice(1).forEach((point) => {
+    emblemShape.lineTo(point.x, point.y);
+  });
+  emblemShape.closePath();
+
+  const emblemGeometry = new THREE.ExtrudeGeometry(emblemShape, {
+    depth: 0.2,
+    bevelEnabled: true,
+    bevelSegments: 3,
+    steps: 1,
+    bevelSize: 0.035,
+    bevelThickness: 0.035,
+    curveSegments: 8
+  });
+
+  emblemGeometry.computeVertexNormals();
+
+  const emblem = new THREE.Mesh(emblemGeometry, blueMaterial);
+  emblem.position.z = 0.12;
+  sculpture.add(emblem);
+
+  /* Floating coloured rings */
+
+  function addTorus(radius, tube, material, position, rotation, scale = 1) {
+    const mesh = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, tube, 16, 120),
+      material
+    );
+
+    mesh.position.set(...position);
+    mesh.rotation.set(...rotation);
+    mesh.scale.setScalar(scale);
+    sculpture.add(mesh);
+    return mesh;
+  }
+
+  const ringA = addTorus(
+    1.65, 0.025, cyanMaterial,
+    [-0.02, 0, -0.24],
+    [Math.PI / 2.5, 0.1, -0.4],
+    1
+  );
+
+  const ringB = addTorus(
+    1.95, 0.012, orangeMaterial,
+    [0, 0, -0.48],
+    [Math.PI / 2.25, 0.2, 0.2],
+    1
+  );
+
+  const ringC = addTorus(
+    1.34, 0.018, silverMaterial,
+    [0, 0, -0.12],
+    [Math.PI / 2.1, -0.2, 0.6],
+    1
+  );
+
+  /* Side fins */
+
+  const finShape = new THREE.Shape();
+  finShape.moveTo(0, 0.8);
+  finShape.bezierCurveTo(0.7, 0.6, 0.8, 0.05, 1.25, -0.55);
+  finShape.lineTo(0.15, -0.25);
+  finShape.bezierCurveTo(-0.2, 0.1, -0.15, 0.45, 0, 0.8);
+
+  const finGeometry = new THREE.ExtrudeGeometry(finShape, {
+    depth: 0.08,
+    bevelEnabled: true,
+    bevelSegments: 2,
+    steps: 1,
+    bevelSize: 0.025,
+    bevelThickness: 0.02
+  });
+
+  const leftFin = new THREE.Mesh(finGeometry, orangeMaterial);
+  leftFin.position.set(-1.2, 0.2, 0.1);
+  leftFin.rotation.z = 2.4;
+  sculpture.add(leftFin);
+
+  const rightFin = new THREE.Mesh(finGeometry, cyanMaterial);
+  rightFin.position.set(0.95, 0.15, 0.1);
+  rightFin.rotation.z = -0.6;
+  rightFin.scale.set(-1, 1, 1);
+  sculpture.add(rightFin);
+
+  const lowerFin = new THREE.Mesh(finGeometry, orangeMaterial);
+  lowerFin.position.set(0.85, -0.55, -0.15);
+  lowerFin.rotation.z = -2.3;
+  lowerFin.scale.set(0.7, 0.7, 0.7);
+  sculpture.add(lowerFin);
+
+  /* Small floating metallic particles */
+
+  const particleCount = isMobile ? 250 : 500;
+  const particlePositions = new Float32Array(particleCount * 3);
+  const particleColors = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount; i++) {
+    const index = i * 3;
+    particlePositions[index] = (Math.random() - 0.5) * 7;
+    particlePositions[index + 1] = (Math.random() - 0.5) * 5;
+    particlePositions[index + 2] = (Math.random() - 0.5) * 4 - 1;
+
+    const useOrange = Math.random() > 0.82;
+    particleColors[index] = useOrange ? 1 : 0.05;
+    particleColors[index + 1] = useOrange ? 0.5 : 0.8;
+    particleColors[index + 2] = useOrange ? 0.02 : 1;
+  }
+
+  const particleGeometry = new THREE.BufferGeometry();
+  particleGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(particlePositions, 3)
+  );
+  particleGeometry.setAttribute(
+    "color",
+    new THREE.BufferAttribute(particleColors, 3)
+  );
+
+  const particleMaterial = new THREE.PointsMaterial({
+    size: isMobile ? 0.018 : 0.024,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+
+  const particles = new THREE.Points(particleGeometry, particleMaterial);
+  scene.add(particles);
+
+  /* Responsive framing */
+
+  let width = 1;
+  let height = 1;
+
+  function resizeScene() {
+    const rect = host.getBoundingClientRect();
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.position.z = width < 480 ? 9.4 : width < 760 ? 8.8 : 8.6;
+    camera.updateProjectionMatrix();
+
+    const mobileScale = width < 480 ? 0.78 : width < 760 ? 0.9 : 1;
+    sculpture.scale.setScalar(mobileScale);
+  }
+
+  const resizeObserver = new ResizeObserver(resizeScene);
+  resizeObserver.observe(host);
+  resizeScene();
+
+  let pointerX = 0;
+  let pointerY = 0;
+  let targetX = 0;
+  let targetY = 0;
+
+  host.addEventListener("pointermove", (event) => {
+    const rect = host.getBoundingClientRect();
+    pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+  }, { passive: true });
+
+  host.addEventListener("pointerleave", () => {
+    pointerX = 0;
+    pointerY = 0;
+  });
+
+  let frameId = 0;
+  let lastFrame = 0;
+  let isVisible = true;
+  let pageVisible = !document.hidden;
+
+  const visibilityObserver = new IntersectionObserver(([entry]) => {
+    isVisible = entry.isIntersecting;
+  });
+
+  visibilityObserver.observe(host);
+
+  document.addEventListener("visibilitychange", () => {
+    pageVisible = !document.hidden;
+  });
+
+  const clock = new THREE.Clock();
+
+  function animate(timestamp = 0) {
+    frameId = requestAnimationFrame(animate);
+
+    if (!pageVisible || !isVisible) return;
+
+    if (!reducedMotion && timestamp - lastFrame < (isMobile ? 32 : 16)) return;
+    lastFrame = timestamp;
+
+    const elapsed = clock.getElapsedTime();
+
+    targetX += (pointerY * 0.18 - targetX) * 0.035;
+    targetY += (pointerX * 0.24 - targetY) * 0.035;
+
+    sculpture.rotation.x = targetX + (reducedMotion ? 0 : Math.sin(elapsed * 0.3) * 0.04);
+    sculpture.rotation.y = targetY + (reducedMotion ? 0 : Math.sin(elapsed * 0.22) * 0.12);
+
+    if (!reducedMotion) {
+      ringA.rotation.z += 0.0018;
+      ringB.rotation.z -= 0.001;
+      ringC.rotation.z += 0.0012;
+      particles.rotation.y = elapsed * 0.018;
+      particles.rotation.x = Math.sin(elapsed * 0.15) * 0.05;
+      sculpture.position.y = Math.sin(elapsed * 0.65) * 0.06;
+
+      cyanLight.intensity = 38 + Math.sin(elapsed * 1.1) * 4;
+      orangeLight.intensity = 34 + Math.sin(elapsed * 0.8 + 1) * 4;
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  window.addEventListener("pagehide", () => {
+    cancelAnimationFrame(frameId);
+    resizeObserver.disconnect();
+    visibilityObserver.disconnect();
+    renderer.dispose();
+    emblemGeometry.dispose();
+    finGeometry.dispose();
+    particleGeometry.dispose();
+    particleMaterial.dispose();
+    cyanMaterial.dispose();
+    blueMaterial.dispose();
+    orangeMaterial.dispose();
+    silverMaterial.dispose();
+    darkMaterial.dispose();
+  }, { once: true });
 }
 
-// =====================================
-// 5. WORKING ENQUIRY FORM
-// =====================================
+initHeroScene();
 
-// IMPORTANT: Replace this with your real business email.
-const STUDIO_EMAIL = 'YOUR_EMAIL@example.com';
+/* ==========================================
+   CONTACT FORM
+   Replace with your real email before launch.
+========================================== */
 
-const contactForm = document.getElementById('contactForm');
-const formStatus = document.getElementById('formStatus');
+const BUSINESS_EMAIL = "YOUR_EMAIL@example.com";
 
-contactForm?.addEventListener('submit', event => {
+const contactForm = $("#contactForm");
+const formFeedback = $("#formFeedback");
+const emailLink = $("#emailLink");
+
+if (emailLink) {
+  emailLink.href = `mailto:${BUSINESS_EMAIL}`;
+  emailLink.textContent = BUSINESS_EMAIL;
+  const arrow = document.createElement("span");
+  arrow.textContent = " ↗";
+  emailLink.appendChild(arrow);
+}
+
+contactForm?.addEventListener("submit", (event) => {
   event.preventDefault();
 
   if (!contactForm.reportValidity()) return;
 
-  if (
-    STUDIO_EMAIL === 'YOUR_EMAIL@example.com' ||
-    !STUDIO_EMAIL.includes('@')
-  ) {
-    formStatus.textContent =
-      'Please configure your business email in script.js before submitting.';
+  if (BUSINESS_EMAIL === "YOUR_EMAIL@example.com") {
+    if (formFeedback) {
+      formFeedback.textContent =
+        "Before launch, replace YOUR_EMAIL@example.com in script.js with your real business email.";
+    }
     return;
   }
 
   const data = new FormData(contactForm);
 
-  const name = String(data.get('name') || '').trim();
-  const email = String(data.get('email') || '').trim();
-  const service = String(data.get('service') || '').trim();
-  const details = String(data.get('details') || '').trim();
+  const name = String(data.get("name") || "").trim();
+  const email = String(data.get("email") || "").trim();
+  const projectType = String(data.get("projectType") || "").trim();
+  const message = String(data.get("message") || "").trim();
 
-  const subject = `Aeterna project enquiry — ${name}`;
+  const subject = encodeURIComponent(`Project enquiry from ${name}`);
+  const body = encodeURIComponent(
+    `Name: ${name}\nEmail: ${email}\nProject type: ${projectType}\n\nProject details:\n${message}`
+  );
 
-  const body = [
-    `Name: ${name}`,
-    `Email: ${email}`,
-    `Service: ${service}`,
-    '',
-    'Project details:',
-    details || 'Not provided'
-  ].join('\n');
+  if (formFeedback) {
+    formFeedback.textContent =
+      "Opening your email app. Please send the prepared message to complete your enquiry.";
+  }
 
-  const mailto =
-    `mailto:${STUDIO_EMAIL}` +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
-
-  formStatus.textContent =
-    'Opening your email application with your enquiry prepared.';
-
-  window.location.href = mailto;
+  window.location.href =
+    `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
 });
-
-// =====================================
-// 6. FOOTER YEAR
-// =====================================
-
-document.getElementById('year').textContent =
-  new Date().getFullYear();
-
-// =====================================
-// 7. PROJECT CARD TILT
-// =====================================
-
-if (
-  !reducedMotion &&
-  window.matchMedia('(hover: hover) and (pointer: fine)').matches
-) {
-  document.querySelectorAll('.project-image').forEach(card => {
-    card.addEventListener('pointermove', event => {
-      const bounds = card.getBoundingClientRect();
-
-      const x =
-        (event.clientX - bounds.left) / bounds.width - 0.5;
-
-      const y =
-        (event.clientY - bounds.top) / bounds.height - 0.5;
-
-      card.style.transform =
-        `perspective(900px) rotateX(${-y * 2}deg) rotateY(${x * 2}deg)`;
-    });
-
-    card.addEventListener('pointerleave', () => {
-      card.style.transform = '';
-    });
-  });
-}
